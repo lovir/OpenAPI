@@ -65,8 +65,8 @@ public class AlarmMailSend {
     	cal.add(Calendar.DATE, -1);
     	lastDay2 = sdf.format(cal.getTime());
     	
-    	System.out.println("lastDay ::: " + lastDay);
-    	System.out.println("lastDay2 ::: " + lastDay2);
+    	//System.out.println("lastDay ::: " + lastDay);
+    	//System.out.println("lastDay2 ::: " + lastDay2);
   			
         try {
            Class.forName(driver);
@@ -107,20 +107,21 @@ public class AlarmMailSend {
 		// TODO Auto-generated method stub
 		
 		float raiseRate = 0;
+		Calendar calnow = new GregorianCalendar();
 		
 		raiseRate = getRaiseRate(alarmKeywords);
 		
-		System.out.println(alarmKeywords + "===" + raiseRate);
+		//System.out.println(alarmKeywords + "===" + raiseRate);
 		
 		if (raiseRate > alarmLevel1) {
-			System.out.println("레벨 3 메일 발송");
-			//sendAlarmMail(alarmMailReceiver, alarmKeywords[i], raiseRate, "발생 레벨 - 상 등급");		
+			System.out.println(calnow.getTime().toString() + " : " + alarmMailReceiver + " >> 발생 레벨 - 상 등급 메일 발송");
+			sendAlarmMail(alarmMailReceiver, alarmKeywords, raiseRate, "발생 레벨 - 상 등급");		
 		} else if (raiseRate > alarmLevel2) {
-			System.out.println("레벨 2 메일 발송");
-			//sendAlarmMail(alarmMailReceiver, alarmKeywords[i], raiseRate, "발생 레벨 - 중 등급");			
+			System.out.println(calnow.getTime().toString() + " : " +alarmMailReceiver + " >> 발생 레벨 - 중 등급 메일 발송");
+			sendAlarmMail(alarmMailReceiver, alarmKeywords, raiseRate, "발생 레벨 - 중 등급");			
 		} else if (raiseRate > alarmLevel3) {
-			System.out.println("레벨 1 메일 발송");
-			//sendAlarmMail(alarmMailReceiver, alarmKeywords[i], raiseRate, "발생 레벨  - 하 등급");			
+			System.out.println(calnow.getTime().toString() + " : " +alarmMailReceiver + " >> 발생 레벨  - 하 등급 메일 발송");
+			sendAlarmMail(alarmMailReceiver, alarmKeywords, raiseRate, "발생 레벨  - 하 등급");			
 		}
 		
 	}
@@ -140,9 +141,9 @@ public class AlarmMailSend {
 		Result result = null;
 		Result[] resultlist = null;
 		
-		query.setLoggable(true); // 검색 로그 설정(FullLog)
+		query.setLoggable(false); // 검색 로그 설정(FullLog)
 		query.setDebug(true); // Debug 설정
-		query.setPrintQuery(true); // PrintQuery 설정
+		query.setPrintQuery(false); // PrintQuery 설정
 		query.setFrom(collectionName); // From 설정, 검색할 컬렉션을 선택
 		query.setResult(0, 0);
 			
@@ -196,7 +197,7 @@ public class AlarmMailSend {
 			result = resultlist[k];
 			
 			if (result != null && result.getRealSize() != 0) {
-				System.out.println("<br><b>Total Count</b> : <u>" + result.getTotalSize() + "</u>");
+				//System.out.println("<br><b>Total Count</b> : <u>" + result.getTotalSize() + "</u>");
 				//out.println("<hr>");
 				if (result.getGroupResultSize() != 0) {
 					GroupResult[] groupResults = result.getGroupResults();
@@ -210,7 +211,7 @@ public class AlarmMailSend {
 							
 							groupCount[j] = value;
 							
-							System.out.println(id + " [<u>" + value + "</u>] <br>");
+							//System.out.println(id + " [<u>" + value + "</u>] <br>");
 						}
 						//out.println("<br>");
 					}
@@ -221,9 +222,9 @@ public class AlarmMailSend {
 			}
 		}
 		
-		System.out.println( "groupCount[0] ::: " + groupCount[0]);
-		System.out.println( "groupCount[1] ::: " + groupCount[1]); 
-		System.out.println( "(groupCount[1] - groupCount[0]) / groupCount[0] * 100 ==== " + (float)(groupCount[1] - groupCount[0]) / groupCount[0] * 100 ) ;
+		//System.out.println( "groupCount[0] ::: " + groupCount[0]);
+		//System.out.println( "groupCount[1] ::: " + groupCount[1]); 
+		//System.out.println( "(groupCount[1] - groupCount[0]) / groupCount[0] * 100 ==== " + (float)(groupCount[1] - groupCount[0]) / groupCount[0] * 100 ) ;
 		
 		if (groupCount[0] == 0) groupCount[0] = 1;
 		
@@ -234,31 +235,36 @@ public class AlarmMailSend {
 	    
         Properties props = new Properties(); 
         props.setProperty("mail.transport.protocol", "smtp"); 
-        props.setProperty("mail.host", "smtp.gmail.com"); 
+        props.setProperty("mail.host", "mail.seoulmetro.co.kr"); 
         props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.port", "465");
-        props.put("mail.smtp.socketFactory.port", "465");
-        props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory"); 
+        props.put("mail.smtp.port", "25");
+        props.put("mail.smtp.socketFactory.port", "25");
+        //props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory"); 
         props.put("mail.smtp.socketFactory.fallback", "false"); 
         props.setProperty("mail.smtp.quitwait", "false"); 
          
         Authenticator auth = new Authenticator(){
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication("lovir99@gmail.com", "tjdgh93"); 
+                return new PasswordAuthentication("bigdata@seoulmetro.co.kr", "bigtata*1"); 
             }
         };
     
         Session session = Session.getDefaultInstance(props,auth);
          
         MimeMessage message = new MimeMessage(session); 
-        message.setSender(new InternetAddress("lovir99@gmail.com")); 
-        message.setSubject("[민원분석 시스템] 알람 키워드 메일 : " + keyword); 
+        message.setSender(new InternetAddress("bigdata@seoulmetro.co.kr")); 
+        message.setSubject("[민원 분석 시스템] 알람 키워드 (" + keyword + ") 메일"); 
  
         message.setRecipient(Message.RecipientType.TO, new InternetAddress(email)); 
+        
+        String mailContent = "";
+        mailContent = "[민원분석 시스템] 알람 키워드  (" + keyword + ") 메일 \n\n\n";
+        mailContent += "알람 키워드  '" + keyword + "'이(가) 전일 대비 발생 건수가 " + raseRate + "% 증가하여 [ " + level + "] 메일을 발송합니다.\n\n";
+        mailContent += "알람 키워드 '" + keyword + "'의 상세내용은 빅데이터 분석시스템의 민원 분석 시스템에서 확인하시기 바랍니다.";
          
         Multipart mp = new MimeMultipart();
         MimeBodyPart mbp1 = new MimeBodyPart();
-        mbp1.setText("[민원분석 시스템] 알람 키워드  " + keyword + "가 전일 대비 발생 건수가 " + raseRate + "% 증가하여 " + level + " 메일을 발송합니다.");
+        mbp1.setText(mailContent);
         mp.addBodyPart(mbp1);
          
         message.setContent(mp);
@@ -284,9 +290,9 @@ public class AlarmMailSend {
 //            alarmMailReceiver = new String[rs.getRow()];
             
             while(rs.next()){
-                System.out.println("KEYWORD       : " + rs.getString("KEYWORD"));
-                System.out.println("LEVEL_1       : " + rs.getInt("LEVEL_1"));
-                System.out.println("EMAIL       : " + rs.getString("EMAIL"));
+                //System.out.println("KEYWORD       : " + rs.getString("KEYWORD"));
+                //System.out.println("LEVEL_1       : " + rs.getInt("LEVEL_1"));
+                //System.out.println("EMAIL       : " + rs.getString("EMAIL"));
                 
                 alarmKeyword[i] = rs.getString("KEYWORD");
                 alarmLevel1[i] = rs.getInt("LEVEL_1");
